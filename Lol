@@ -1,1 +1,132 @@
+import 'package:flutter/material.dart';
 
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: MainPage(),
+    );
+  }
+}
+
+class MainPage extends StatefulWidget {
+  @override
+  _MainPageState createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
+  int currentIndex = 0;
+
+  final List<Widget> pages = [
+    HomePage(),
+    ProfilePage(),
+    MessagesPage(),
+    SettingsPage(),
+  ];
+
+  final List<String> titles = [
+    "Home",
+    "Profile",
+    "Messages",
+    "Settings",
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      
+      // APP BAR
+      appBar: AppBar(
+        title: Text(titles[currentIndex]),
+      ),
+
+      // BODY
+      body: pages[currentIndex],
+
+      // DRAWER WITH LOOP
+      drawer: Drawer(
+        child: ListView.builder(
+          itemCount: titles.length,
+          itemBuilder: (context, index) {
+            return ListTile(
+              title: Text(titles[index]),
+              leading: Icon(getIcon(index)),
+              onTap: () {
+                setState(() {
+                  currentIndex = index;
+                });
+                Navigator.pop(context);
+              },
+            );
+          },
+        ),
+      ),
+
+      // BOTTOM NAVIGATION BAR
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: currentIndex,
+        onTap: (index) {
+          setState(() {
+            currentIndex = index;
+          });
+        },
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+          BottomNavigationBarItem(icon: Icon(Icons.message), label: "Messages"),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Settings"),
+        ],
+      ),
+    );
+  }
+
+  // Helper for Drawer Icons
+  IconData getIcon(int index) {
+    switch (index) {
+      case 0:
+        return Icons.home;
+      case 1:
+        return Icons.person;
+      case 2:
+        return Icons.message;
+      case 3:
+        return Icons.settings;
+      default:
+        return Icons.circle;
+    }
+  }
+}
+
+// PAGES
+class HomePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(child: Text("Home Page"));
+  }
+}
+
+class ProfilePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(child: Text("Profile Page"));
+  }
+}
+
+class MessagesPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(child: Text("Messages Page"));
+  }
+}
+
+class SettingsPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(child: Text("Settings Page"));
+  }
+}
