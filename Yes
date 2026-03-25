@@ -1,3 +1,29 @@
+import 'package:flutter/material.dart';
+import 'pages/home.dart';
+import 'pages/profile.dart';
+import 'pages/message.dart';
+import 'pages/settings.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Litongs Phone Settings',
+      theme: ThemeData(primarySwatch: Colors.red),
+      home: MainScreen(),
+    );
+  }
+}
+
+class MainScreen extends StatefulWidget {
+  @override
+  _MainScreenState createState() => _MainScreenState();
+}
+
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
@@ -8,88 +34,56 @@ class _MainScreenState extends State<MainScreen> {
     SettingsPage(),
   ];
 
-  final List<String> _titles = [
-    "Home",
-    "Profile",
-    "Message",
-    "Settings"
-  ];
-
-  final List<IconData> _icons = [
-    Icons.home,
-    Icons.person,
-    Icons.message,
-    Icons.settings
-  ];
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
-
-    if (Navigator.canPop(context)) {
-      Navigator.pop(context);
-    }
+    Navigator.of(context).pop(); // closes drawer automatically
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100], // soft background
-
-      // APP BAR
       appBar: AppBar(
-        title: Text(_titles[_selectedIndex]),
-        centerTitle: true,
-        backgroundColor: Colors.deepPurple,
-        elevation: 3,
+        title: Text('Litongs Phone Settings'),
       ),
-
-      // DRAWER
       drawer: Drawer(
-        child: Column(
+        child: ListView(
+          padding: EdgeInsets.zero,
           children: [
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(20),
-              color: Colors.deepPurple,
+            DrawerHeader(
+              decoration: BoxDecoration(color: Colors.blue),
               child: Text(
-                "Menu",
-                style: TextStyle(color: Colors.white, fontSize: 24),
+                'Menu',
+                style: TextStyle(color: Colors.redAccent, fontSize: 24),
               ),
             ),
-
-            Expanded(
-              child: ListView.builder(
-                itemCount: _titles.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    leading: Icon(
-                      _icons[index],
-                      color: Colors.deepPurple,
-                    ),
-                    title: Text(_titles[index]),
-                    selected: _selectedIndex == index,
-                    selectedTileColor: Colors.deepPurple[50],
-                    onTap: () => _onItemTapped(index),
-                  );
-                },
-              ),
+            ListTile(
+              leading: Icon(Icons.home),
+              title: Text('Home'),
+              onTap: () => _onItemTapped(0),
+            ),
+            ListTile(
+              leading: Icon(Icons.person),
+              title: Text('Profile'),
+              onTap: () => _onItemTapped(1),
+            ),
+            ListTile(
+              leading: Icon(Icons.message),
+              title: Text('Message'),
+              onTap: () => _onItemTapped(2),
+            ),
+            ListTile(
+              leading: Icon(Icons.settings),
+              title: Text('Settings'),
+              onTap: () => _onItemTapped(3),
             ),
           ],
         ),
       ),
-
-      // BODY
       body: _pages[_selectedIndex],
-
-      // BOTTOM NAV BAR
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.deepPurple,
-        unselectedItemColor: Colors.grey,
-        backgroundColor: Colors.white,
-        type: BottomNavigationBarType.fixed,
         onTap: _onItemTapped,
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
