@@ -5,30 +5,34 @@ import 'pages/message.dart';
 import 'pages/settings.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key}); // ✅ FIX (null safety)
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Litongs Phone Settings',
       theme: ThemeData(primarySwatch: Colors.red),
-      home: MainScreen(),
+      home: const MainScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
 class MainScreen extends StatefulWidget {
+  const MainScreen({super.key}); // ✅ FIX
+
   @override
-  _MainScreenState createState() => _MainScreenState();
+  State<MainScreen> createState() => _MainScreenState(); // ✅ FIX
 }
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = [
+  final List<Widget> _pages = const [
     HomePage(key: ValueKey('home')),
     ProfilePage(key: ValueKey('profile')),
     MessagePage(key: ValueKey('message')),
@@ -39,21 +43,24 @@ class _MainScreenState extends State<MainScreen> {
     setState(() {
       _selectedIndex = index;
     });
-    Navigator.of(context).pop(); // close drawer
+
+    // ✅ prevents error if drawer is not open
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Litongs Phone Settings'),
+        title: const Text('Litongs Phone Settings'),
       ),
 
-      // 🔥 DRAWER
       drawer: Drawer(
         child: ListView(
           children: [
-            DrawerHeader(
+            const DrawerHeader(
               decoration: BoxDecoration(color: Colors.blue),
               child: Text(
                 'Menu',
@@ -68,30 +75,27 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
 
-      // 🔥 ANIMATED PAGE TRANSITION
+      // ✅ FIXED ANIMATION (no crash)
       body: AnimatedSwitcher(
-        duration: Duration(milliseconds: 400),
+        duration: const Duration(milliseconds: 400),
         transitionBuilder: (child, animation) {
-          final slide = Tween<Offset>(
-            begin: Offset(1, 0), // slide from right
-            end: Offset(0, 0),
-          ).animate(animation);
-
           return SlideTransition(
-            position: slide,
+            position: Tween<Offset>(
+              begin: const Offset(1, 0),
+              end: Offset.zero,
+            ).animate(animation),
             child: child,
           );
         },
         child: _pages[_selectedIndex],
       ),
 
-      // 🔥 BOTTOM NAV
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         selectedItemColor: Colors.blueAccent,
         unselectedItemColor: Colors.grey,
-        items: [
+        items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
           BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Message'),
