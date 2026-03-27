@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'pages/home.dart';
+import 'pages/profile.dart';
+import 'pages/message.dart';
+import 'pages/settings.dart';
 
 void main() {
   runApp(MyApp());
@@ -8,125 +12,100 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: 'Litongs Phone Settings',
+      theme: ThemeData(primarySwatch: Colors.red),
+      home: MainScreen(),
       debugShowCheckedModeBanner: false,
-      home: MainPage(),
     );
   }
 }
 
-class MainPage extends StatefulWidget {
+class MainScreen extends StatefulWidget {
   @override
-  _MainPageState createState() => _MainPageState();
+  _MainScreenState createState() => _MainScreenState();
 }
 
-class _MainPageState extends State<MainPage> {
-  int currentIndex = 0;
+class _MainScreenState extends State<MainScreen> {
+  int _selectedIndex = 0;
 
-  final List<Widget> pages = [
-    HomePage(),
-    ProfilePage(),
-    MessagesPage(),
-    SettingsPage(),
+  final List<Widget> _pages = [
+    HomePage(key: ValueKey('home')),
+    ProfilePage(key: ValueKey('profile')),
+    MessagePage(key: ValueKey('message')),
+    SettingsPage(key: ValueKey('settings')),
   ];
 
-  final List<String> titles = [
-    "Home",
-    "Profile",
-    "Messages",
-    "Settings",
-  ];
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    Navigator.of(context).pop(); // close drawer
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
-      // APP BAR
       appBar: AppBar(
-        title: Text(titles[currentIndex]),
+        title: Text('Litongs Phone Settings'),
       ),
 
-      // BODY
-      body: pages[currentIndex],
-
-      // DRAWER WITH LOOP
+      // 🔥 DRAWER
       drawer: Drawer(
-        child: ListView.builder(
-          itemCount: titles.length,
-          itemBuilder: (context, index) {
-            return ListTile(
-              title: Text(titles[index]),
-              leading: Icon(getIcon(index)),
-              onTap: () {
-                setState(() {
-                  currentIndex = index;
-                });
-                Navigator.pop(context);
-              },
-            );
-          },
+        child: ListView(
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(color: Colors.blue),
+              child: Text(
+                'Menu',
+                style: TextStyle(color: Colors.white, fontSize: 24),
+              ),
+            ),
+            _drawerItem(Icons.home, "Home", 0),
+            _drawerItem(Icons.person, "Profile", 1),
+            _drawerItem(Icons.message, "Message", 2),
+            _drawerItem(Icons.settings, "Settings", 3),
+          ],
         ),
       ),
 
-      // BOTTOM NAVIGATION BAR
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: currentIndex,
-        onTap: (index) {
-          setState(() {
-            currentIndex = index;
-          });
+      // 🔥 ANIMATED PAGE TRANSITION
+      body: AnimatedSwitcher(
+        duration: Duration(milliseconds: 400),
+        transitionBuilder: (child, animation) {
+          final slide = Tween<Offset>(
+            begin: Offset(1, 0), // slide from right
+            end: Offset(0, 0),
+          ).animate(animation);
+
+          return SlideTransition(
+            position: slide,
+            child: child,
+          );
         },
+        child: _pages[_selectedIndex],
+      ),
+
+      // 🔥 BOTTOM NAV
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        selectedItemColor: Colors.blueAccent,
+        unselectedItemColor: Colors.grey,
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
-          BottomNavigationBarItem(icon: Icon(Icons.message), label: "Messages"),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Settings"),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+          BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Message'),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
         ],
       ),
     );
   }
 
-  // Helper for Drawer Icons
-  IconData getIcon(int index) {
-    switch (index) {
-      case 0:
-        return Icons.home;
-      case 1:
-        return Icons.person;
-      case 2:
-        return Icons.message;
-      case 3:
-        return Icons.settings;
-      default:
-        return Icons.circle;
-    }
-  }
-}
-
-// PAGES
-class HomePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: Text("Home Page"));
-  }
-}
-
-class ProfilePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: Text("Profile Page"));
-  }
-}
-
-class MessagesPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: Text("Messages Page"));
-  }
-}
-
-class SettingsPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: Text("Settings Page"));
+  Widget _drawerItem(IconData icon, String title, int index) {
+    return ListTile(
+      leading: Icon(icon),
+      title: Text(title),
+      onTap: () => _onItemTapped(index),
+    );
   }
 }
