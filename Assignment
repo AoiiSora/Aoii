@@ -1,0 +1,84 @@
+import 'package:flutter/material.dart';
+
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  double _opacity = 1.0;
+  bool _isZoomed = false;
+
+  void _animate() {
+    setState(() {
+      _opacity = _opacity == 1.0 ? 0.0 : 1.0;
+      _isZoomed = !_isZoomed;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          
+          // 🔹 HERO + TAP TO OPEN
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => ImagePage()),
+              );
+            },
+            child: Hero(
+              tag: "pvp-image",
+              child: AnimatedContainer(
+                duration: Duration(milliseconds: 500),
+                width: _isZoomed ? 250 : 200,
+                height: _isZoomed ? 250 : 200,
+                child: Image.asset('assets/images/pvp.png'),
+              ),
+            ),
+          ),
+
+          SizedBox(height: 20),
+
+          // 🔹 FADE TEXT
+          AnimatedOpacity(
+            duration: Duration(seconds: 1),
+            opacity: _opacity,
+            child: Text(
+              'Home Page',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+          ),
+
+          SizedBox(height: 20),
+
+          ElevatedButton(
+            onPressed: _animate,
+            child: Text("Animate"),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+// 🔥 SECOND PAGE (Hero Animation Target)
+class ImagePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Image View')),
+      body: Center(
+        child: Hero(
+          tag: "pvp-image",
+          child: Image.asset('assets/images/pvp.png', width: 300),
+        ),
+      ),
+    );
+  }
+}
