@@ -9,7 +9,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key}); // ✅ FIX (null safety)
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,28 +23,34 @@ class MyApp extends StatelessWidget {
 }
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key}); // ✅ FIX
+  const MainScreen({super.key});
 
   @override
-  State<MainScreen> createState() => _MainScreenState(); // ✅ FIX
+  State<MainScreen> createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = const [
-    HomePage(key: ValueKey('home')),
-    ProfilePage(key: ValueKey('profile')),
-    MessagePage(key: ValueKey('message')),
-    SettingsPage(key: ValueKey('settings')),
-  ];
+  late final List<Widget> _pages;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _pages = [
+      HomePage(onNavigate: _onItemTapped),
+      ProfilePage(onNavigate: _onItemTapped),
+      MessagePage(onNavigate: _onItemTapped),
+      SettingsPage(onNavigate: _onItemTapped),
+    ];
+  }
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
 
-    // ✅ prevents error if drawer is not open
     if (Navigator.canPop(context)) {
       Navigator.pop(context);
     }
@@ -75,7 +81,7 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
 
-      // ✅ FIXED ANIMATION (no crash)
+      // 🔥 PAGE TRANSITION
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 400),
         transitionBuilder: (child, animation) {
