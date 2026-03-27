@@ -1,0 +1,164 @@
+import 'package:flutter/material.dart';
+import 'pages/home.dart';
+import 'pages/profile.dart';
+import 'pages/message.dart';
+import 'pages/settings.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Litongs Phone Settings',
+      theme: ThemeData(primarySwatch: Colors.red),
+      home: MainScreen(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class MainScreen extends StatefulWidget {
+  @override
+  _MainScreenState createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  int _selectedIndex = 0;
+  bool _isExpanded = false;
+  double _opacity = 1.0;
+
+  final List<Widget> _pages = [
+    HomePage(),
+    ProfilePage(),
+    MessagePage(),
+    SettingsPage(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+    Navigator.of(context).pop();
+  }
+
+  void _toggleAnimation() {
+    setState(() {
+      _isExpanded = !_isExpanded;
+      _opacity = _opacity == 1.0 ? 0.0 : 1.0;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Litongs Phone Settings'),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(color: Colors.blue),
+              child: Text('Menu',
+                  style: TextStyle(color: Colors.white, fontSize: 24)),
+            ),
+            _drawerItem(Icons.home, "Home", 0),
+            _drawerItem(Icons.person, "Profile", 1),
+            _drawerItem(Icons.message, "Message", 2),
+            _drawerItem(Icons.settings, "Settings", 3),
+          ],
+        ),
+      ),
+
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // 🔹 Asset Image + Hero Animation
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (_, __, ___) => SecondPage(),
+                  transitionsBuilder: (_, anim, __, child) {
+                    return FadeTransition(opacity: anim, child: child);
+                  },
+                ),
+              );
+            },
+            child: Hero(
+              tag: "hero-image",
+              child: Image.asset("assets/images/sample.jpg", height: 120),
+            ),
+          ),
+
+          SizedBox(height: 20),
+
+          // 🔹 Animated Container (Implicit Animation)
+          AnimatedContainer(
+            duration: Duration(seconds: 1),
+            width: _isExpanded ? 200 : 100,
+            height: _isExpanded ? 200 : 100,
+            color: _isExpanded ? Colors.blue : Colors.red,
+          ),
+
+          SizedBox(height: 20),
+
+          // 🔹 Fade Animation
+          AnimatedOpacity(
+            duration: Duration(seconds: 1),
+            opacity: _opacity,
+            child: Text("Hello Animation!", style: TextStyle(fontSize: 20)),
+          ),
+
+          SizedBox(height: 20),
+
+          ElevatedButton(
+            onPressed: _toggleAnimation,
+            child: Text("Animate"),
+          ),
+        ],
+      ),
+
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        selectedItemColor: Colors.blueAccent,
+        unselectedItemColor: Colors.grey,
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+          BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Message'),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
+        ],
+      ),
+    );
+  }
+
+  Widget _drawerItem(IconData icon, String title, int index) {
+    return ListTile(
+      leading: Icon(icon),
+      title: Text(title),
+      onTap: () => _onItemTapped(index),
+    );
+  }
+}
+
+//  Second Page for Hero Animation
+class SecondPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Hero Animation")),
+      body: Center(
+        child: Hero(
+          tag: "hero-image",
+          child: Image.asset("assets/images/sample.jpg", height: 250),
+        ),
+      ),
+    );
+  }
+}
